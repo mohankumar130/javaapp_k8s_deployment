@@ -5,7 +5,7 @@ pipeline {
     }
     environment {
         hub_user = "msy061618"
-        project = "tomcat"
+        containername = "tomcat"
     }
     stages {
         stage('Git Chekout') {
@@ -13,12 +13,12 @@ pipeline {
                 git 'https://github.com/mohankumar130/maven.git'
             }
         }
-        stage('Build'){
+        stage('Build Maven'){
             steps {
                 sh 'mvn clean package'
             }
         }       
-        stage('Image Build') {
+        stage('Docker Image Build') {
             steps {
                 sh 'docker image build -t "${hub_user}"/$JOB_NAME:v1.$BUILD_ID .'
             }
@@ -56,7 +56,7 @@ pipeline {
         stage('Deploy into docker container') {
             steps {
                 script {
-                    sh 'docker run -it -d --name "${hub_user}" -p 8085:8080 "${hub_user}"/$JOB_NAME:latest'
+                    sh 'docker run -it -d --name tomcat -p 8085:8080 "${hub_user}"/$JOB_NAME:latest'
                 }
             }
         }
