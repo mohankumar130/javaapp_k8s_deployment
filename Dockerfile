@@ -24,7 +24,7 @@ COPY config_file/tomcat-users.xml /opt/tomcat/tomcat10/conf/
 COPY config_file/context.xml /opt/tomcat/tomcat10/webapps/host-manager/META-INF/
 COPY config_file/context.xml /opt/tomcat/tomcat10/webapps/manager/META-INF/
 # Copy the WAR file from the target directory of your Maven project to the Tomcat webapps directory
-COPY target/webapp.war /usr/local/tomcat/webapps/
+COPY target/webapp.war /opt/tomcat/tomcat10/webapps/
 # Expose port 8080
 EXPOSE 8080
 # Start Tomcat
