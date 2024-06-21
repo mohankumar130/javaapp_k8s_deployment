@@ -19,10 +19,10 @@ RUN mkdir /opt/tomcat \
 # Ensure catalina.sh is executable
 RUN chmod +x /opt/tomcat/tomcat10/bin/catalina.sh
 # Add Tomcat users configuration
-COPY tomcat-users.xml /opt/tomcat/tomcat10/conf/
+COPY config_file/tomcat-users.xml /opt/tomcat/tomcat10/conf/
 # Add manager and host manger context file
-COPY context.xml /opt/tomcat/tomcat10/webapps/host-manager/META-INF/
-COPY context.xml /opt/tomcat/tomcat10/webapps/manager/META-INF/
+COPY config_file/context.xml /opt/tomcat/tomcat10/webapps/host-manager/META-INF/
+COPY config_file/context.xml /opt/tomcat/tomcat10/webapps/manager/META-INF/
 # Expose port 8080
 EXPOSE 8080
 # Start Tomcat
