@@ -65,7 +65,7 @@ pipeline {
                 sshagent(['deployuser']) {
                     sh 'ssh -o StrictHostKeyChecking=no deploy@192.168.1.17 cat /etc/hosts'
                     sh 'ssh -o StrictHostKeyChecking=no deploy@192.168.1.17 kubectl get nodes'
-                    sh 'ssh -o StrictHostKeyChecking=no deploy@192.168.1.17 helm install java ./java-maven-chart'
+                    sh 'ssh -o StrictHostKeyChecking=no deploy@192.168.1.17 helm install tomcat ./java-maven-chart --dry-run --debug'
                 }
             }
         }
