@@ -53,13 +53,13 @@ pipeline {
                 }
             }
         }
-        stage('Deploy into docker container') {
-            steps {
-                script {
-                    sh 'docker run -it -d --name tomcat -p 8085:8080 "${hub_user}"/$JOB_NAME:latest'
-                }
-            }
-        }
+        // stage('Deploy into docker container') {
+        //     steps {
+        //         script {
+        //             sh 'docker run -it -d --name tomcat -p 8085:8080 "${hub_user}"/$JOB_NAME:latest'
+        //         }
+        //     }
+        // }
         stage('Deploy to k8"s') {
             steps {
                 sshagent(['deployuser']) {
