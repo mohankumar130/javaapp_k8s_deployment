@@ -71,7 +71,7 @@ pipeline {
                                             )
                     {
                         sh 'kubectl get nodes'
-                        sh 'helm upgrade -i tomcat java-maven-chart'                    
+                        sh 'helm upgrade -i tomcat java-maven-chart --set image.repository=${hub_user}"/$JOB_NAME --image.tag=v1.$BUILD_ID --namespace uat'                    
                     }
                 }
             }
