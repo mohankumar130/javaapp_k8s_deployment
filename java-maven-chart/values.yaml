@@ -44,7 +44,7 @@ service:
   port: 80
   targetPort: 8080
   protocol: TCP
-  nodeport: 32005
+  nodePort: 32123
   name: java-chart
 
 ingress:
