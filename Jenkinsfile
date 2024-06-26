@@ -71,11 +71,12 @@ pipeline {
                                             )
                     {
                         sh 'kubectl get nodes'
-                        sh """helm upgrade --install tomcat java-maven-chart \
-                         --set image.repository=${hub_user}"/$JOB_NAME \
+                        sh """
+                        helm upgrade --install tomcat java-maven-chart \
+                         --set image.repository=${hub_user}/${JOB_NAME} \
                          --set image.tag=v1.$BUILD_ID \
                          --namespace uat
-                         """
+                        """
                     }
                 }
             }
