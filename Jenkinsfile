@@ -71,7 +71,7 @@ pipeline {
                                             )
                     {
                         sh 'kubectl get nodes'
-                        sh 'helm install tomcat java-maven-chart'                    
+                        sh 'helm upgrade -i tomcat java-maven-chart'                    
                     }
                 }
             }
