@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+    tools {
+        maven "Maven3"
+        Docker "Docker"
+    }
+    stages {
+        stage('git check out') {
+            steps {
+               git 'https://github.com/mohankumar130/maven.git'
+            }
+        }
+        stage('Build Maven'){
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage('Docker Image push into Regis') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'dockerhubpass', variable: 'dockerpass')]) {
+                        sh 'docker login -u "${hub_user}" -p ${dockerpass}'
+                        sh 'docker image tag "${hub_user}"/$JOB_NAME:v1.$BUILD_ID "${hub_user}"/$JOB_NAME:latest'
+                        sh 'docker image tag "${hub_user}"/$JOB_NAME:v1.$BUILD_ID "${hub_user}"/$JOB_NAME:v1.$BUILD_ID'
+                        sh 'docker push "${hub_user}"/$JOB_NAME:v1.$BUILD_ID'
+                        sh 'docker push "${hub_user}"/$JOB_NAME:latest'
+                        // sh 'docker image rm "${hub_user}"/$JOB_NAME:v1.$BUILD_ID-1 "${hub_user}"/$JOB_NAME:latest '
+                        }
+                    }
+                }               
+            }
+    }
+}

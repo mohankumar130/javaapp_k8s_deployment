@@ -6,6 +6,7 @@ pipeline {
     environment {
         hub_user = "msy061618"
         containername = "tomcat"
+        CA_CERTIFICATE = credentials('kubeca')
     }
     stages {
         stage('Git Chekout') {
@@ -60,12 +61,18 @@ pipeline {
         //         }
         //     }
         // }
-        stage('Deploy to k8"s') {
+        stage('deploy application into kubernetes cluster') {
             steps {
-                sshagent(['deployuser']) {
-                    sh 'ssh -o StrictHostKeyChecking=no deploy@192.168.1.17 cat /etc/hosts'
-                    sh 'ssh -o StrictHostKeyChecking=no deploy@192.168.1.17 kubectl get nodes'
-                    sh 'ssh -o StrictHostKeyChecking=no deploy@192.168.1.17 helm install tomcat ./java-maven-chart --dry-run --debug'
+                withCredentials([string(credentialsId: 'kubeca', variable: 'cacerti')]){
+                 kubeconfig(
+                    caCertificate: "${env.CA_CERTIFICATE}"  ,
+                    credentialsId: 'kubeconfigfile', 
+                    serverUrl: 'https://192.168.1.17:6443'
+                                            )
+                    {
+                        sh 'kubectl get nodes'
+                        sh 'helm install tomcat java-maven-chart'                    
+                    }
                 }
             }
         }
