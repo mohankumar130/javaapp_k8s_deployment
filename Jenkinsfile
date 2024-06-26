@@ -33,34 +33,20 @@ pipeline {
                         sh 'docker image tag "${hub_user}"/$JOB_NAME:v1.$BUILD_ID "${hub_user}"/$JOB_NAME:v1.$BUILD_ID'
                         sh 'docker push "${hub_user}"/$JOB_NAME:v1.$BUILD_ID'
                         sh 'docker push "${hub_user}"/$JOB_NAME:latest'
-                        // sh 'docker image rm "${hub_user}"/$JOB_NAME:v1.$BUILD_ID-1 "${hub_user}"/$JOB_NAME:latest '
-                        }
-                    }
-                }               
-            }
-        stage('Clean Previous Docker Image') {
-            steps {
-                script {
-                    def jobName = env.JOB_NAME
-                    def previousVersionTag = "v1.${env.BUILD_ID.toInteger() - 1}"
-                    def previousImage = "${hub_user}/${jobName}:${previousVersionTag}"
+                        def jobName = env.JOB_NAME
+                        def previousVersionTag = "v1.${env.BUILD_ID.toInteger() - 1}"
+                        def previousImage = "${hub_user}/${jobName}:${previousVersionTag}"
                     
-                    // Check if the previous image exists and delete it if it does
-                    sh """
-                    if docker images --format '{{.Repository}}:{{.Tag}}' | grep -q '${previousImage}'; then
-                        docker rmi -f ${previousImage}
-                    fi
-                    """
+                        // Check if the previous image exists and delete it if it does
+                        sh """
+                        if docker images --format '{{.Repository}}:{{.Tag}}' | grep -q '${previousImage}'; then
+                            docker rmi -f ${previousImage}
+                        fi
+                        """
+                    }
                 }
-            }
+            }               
         }
-        // stage('Deploy into docker container') {
-        //     steps {
-        //         script {
-        //             sh 'docker run -it -d --name tomcat -p 8085:8080 "${hub_user}"/$JOB_NAME:latest'
-        //         }
-        //     }
-        // }
         stage('deploy application into kubernetes cluster') {
             steps {
                 withCredentials([string(credentialsId: 'kubeca', variable: 'cacerti')]){
