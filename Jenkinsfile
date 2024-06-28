@@ -48,7 +48,7 @@ pipeline {
                 }
             }
         }
-        stage('Approval for Waiting') {
+        stage('Waiting for Project Head Approval') {
             steps {
                 script {
                     def userAborted = false
@@ -77,9 +77,9 @@ pipeline {
                     if (userAborted) {
                         currentBuild.result = 'ABORTED'
                         echo "Approval person has rejected the deploy."
-                        error("Approval was rejected, stopping the pipeline.")
+                        error("Approval was rejected, stopping the Deployment.")
                     } else {
-                        echo "Approval granted. Proceeding with the pipeline."
+                        echo "Approval granted. Proceeding with the Deployment."
                     }
                 }
             }
