@@ -65,7 +65,7 @@ pipeline {
                         recipientProviders: [[$class: 'CulpritsRecipientProvider']]
 
                         catchError(buildResult: 'ABORTED', stageResult: 'ABORTED') {
-                            input submitter: 'project_head', message: 'Do you approve?'
+                            input submitter: 'project_approval', message: 'Do you approve?'
                         }
 
                         if (currentBuild.result == 'ABORTED') {
