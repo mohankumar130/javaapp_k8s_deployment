@@ -7,6 +7,9 @@ pipeline {
         hub_user = "msy061618"
         containername = "tomcat"
         CA_CERTIFICATE = credentials('kubeca')
+        jobName = "${env.JOB_NAME} #${env.BUILD_NUMBER}"
+        mailToRecipients = "awsfree7864@gmail.com"
+        useremail = "msy061618@gmail.com"
     }
     stages {
         stage('Git Chekout') {
@@ -46,6 +49,37 @@ pipeline {
                     }
                 }
             }               
+        }
+        stage('Test') {
+            steps {
+                script {
+                    def userAborted = false
+                    emailext body: '''
+                    Please click the link below
+                    ${BUILD_URL}input to approve or Reject.<br>
+                    ''',
+                    mimeType: 'text/html',
+                    subject: "Approval Needed: ${jobName}",
+                    from: "${useremail}",
+                    to: "${mailToRecipients}",
+                    recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+
+                    try {
+                        userInput = input submitter: 'admin', message: 'Do you approve?'
+                    } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+                        cause = e.causes.get(0)
+                        echo "Aborted by " + cause.getUser().toString()
+                        userAborted = true
+                        echo "SYSTEM aborted, but looks like timeout period didn't complete. Aborting."
+                    }
+                    if (userAborted) {
+                        currentBuild.result = "Abort"
+                        echo "Approval person has been rejected that deploy"
+                    } else {
+                        echo "Testing"
+                    }
+                }
+            }
         }
         stage('deploy application into kubernetes cluster') {
             steps {
