@@ -52,8 +52,8 @@ pipeline {
             steps {
                 script {
                     def userAborted = false
-                    withCredentials([string(credentialsId: 'MAIL_RECIPIENTS', variable: 'mailToRecipients'), 
-                                     string(credentialsId: 'USER_EMAIL', variable: 'useremail')]) {
+                    withCredentials([string(credentialsId: 'toaddress', variable: 'mailToRecipients'), 
+                                     string(credentialsId: 'fromaddress', variable: 'useremail')]) {
                         emailext body: '''
                         Please click the link below
                         ${BUILD_URL}input to approve or Reject.<br>
