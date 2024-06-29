@@ -44,7 +44,7 @@ pipeline {
                 }
             }
         }
-        stage('Waiting for Project Head Approval') {
+        stage('Waiting for Project Head Approval Deployment') {
             steps {
                 script {
                     def userAborted = false
