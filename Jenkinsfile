@@ -20,14 +20,10 @@ pipeline {
                 sh 'mvn clean package'
             }
         }
-        stage('Docker Image Build') {
-            steps {
-                sh 'docker image build -t "${hub_user}"/$JOB_NAME:v1.$BUILD_ID .'
-            }
-        }
-        stage('Docker Image Push into Registry') {
+        stage('Docker Image Build & Push into Registry') {
             steps {
                 script {
+                    sh 'docker image build -t "${hub_user}"/$JOB_NAME:v1.$BUILD_ID .'
                     withCredentials([string(credentialsId: 'hubpasswd', variable: 'dockerpass')]) {
                         sh 'docker login -u "${hub_user}" -p ${dockerpass}'
                         sh 'docker image tag "${hub_user}"/$JOB_NAME:v1.$BUILD_ID "${hub_user}"/$JOB_NAME:latest'
