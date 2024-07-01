@@ -98,24 +98,32 @@ pipeline {
                 }
             }
             steps {
+
                 withCredentials([string(credentialsId: 'kubeca', variable: 'cacerti')]){
                     kubeconfig(
                         caCertificate: "${env.CA_CERTIFICATE}"  ,
                         credentialsId: 'kubeconfigfile', 
                         serverUrl: 'https://192.168.1.17:6443'
-                    ) {
-                        sh 'kubectl get nodes'
-                        sh """
-                        helm upgrade --install ${APP_NAME} java-maven-chart \
-                         --set image.repository=${IMAGE_NAME} \
-                         --set image.tag=${IMAGE_TAG} \
-                         --namespace uat
-                        """
+                        ) {
+                            script {
+                                try {
+                                    sh 'kubectl version'
+                                    sh 'kubectl get nodes'
+                                    sh """
+                                    helm upgrade --install ${APP_NAME} java-maven-chart \
+                                        --set image.repository=${IMAGE_NAME} \
+                                        --set image.tag=${IMAGE_TAG} \
+                                        --namespace uat
+                                    """
+                                } catch (Exception e) {
+                                    error("Failed to interact with Kubernetes cluster: ${e}")
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
-    }
     post {
         success {
             echo "Build and deployment were successful."
