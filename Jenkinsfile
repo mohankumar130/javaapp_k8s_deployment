@@ -109,9 +109,9 @@ pipeline {
                     ) {
                         sh 'kubectl get nodes'
                         sh """
-                        helm upgrade --install ${containername} java-maven-chart \
-                         --set image.repository=${hub_user}/${JOB_NAME} \
-                         --set image.tag=v1.$BUILD_ID \
+                        helm upgrade --install ${tomcat-java-app} java-maven-chart \
+                         --set image.repository=${IMAGE_NAME} \
+                         --set image.tag= ${IMAGE_TAG}\
                          --namespace uat
                         """
                     }
