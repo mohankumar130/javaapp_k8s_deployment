@@ -4,10 +4,14 @@ pipeline {
         maven "Maven3"
     }
     environment {
-        hub_user = "msy061618"
-        containername = "tomcat"
+        APP_NAME = "tomcat-java-app"
+        RELEASE = "1.0"
+        DOCKER_USER = "msy061618"
+        DOCKER_PASS = 'dockerhub'
+        IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
+        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
         CA_CERTIFICATE = credentials('kubeca')
-        jobName = "${env.JOB_NAME} #${env.BUILD_NUMBER}"
+       
     }
     stages {
         stage('Git Checkout') {
@@ -32,13 +36,14 @@ pipeline {
         stage('Docker Image Build & Push into Registry') {
             steps {
                 script {
-                    sh 'docker image build -t "${hub_user}"/$JOB_NAME:v1.$BUILD_ID .'
-                    withCredentials([string(credentialsId: 'hubpasswd', variable: 'dockerpass')]) {
-                        sh 'docker login -u "${hub_user}" -p ${dockerpass}'
-                        sh 'docker image tag "${hub_user}"/$JOB_NAME:v1.$BUILD_ID "${hub_user}"/$JOB_NAME:latest'
-                        sh 'docker image tag "${hub_user}"/$JOB_NAME:v1.$BUILD_ID "${hub_user}"/$JOB_NAME:v1.$BUILD_ID'
-                        sh 'docker push "${hub_user}"/$JOB_NAME:v1.$BUILD_ID'
-                        sh 'docker push "${hub_user}"/$JOB_NAME:latest'
+                    docker.withRegistry('',DOCKER_PASS) {
+                        docker_image = docker.build "${IMAGE_NAME}"
+                        }
+                        
+                    docker.withRegistry('',DOCKER_PASS) {
+                        docker_image.push("${IMAGE_TAG}")
+                        docker_image.push('latest')
+                        } {                            
                         def jobName = env.JOB_NAME
                         def previousVersionTag = "v1.${env.BUILD_ID.toInteger() - 1}"
                         def previousImage = "${hub_user}/${jobName}:${previousVersionTag}"
@@ -81,7 +86,7 @@ pipeline {
 
                     if (userAborted) {
                         currentBuild.result = 'ABORTED'
-                        echo "Approval person has rejected the deploy."
+                        echo "Approval person has rejected the deployment."
                         error("Approval was rejected, stopping the Deployment.")
                     } else {
                         echo "Approval granted. Proceeding with the Deployment."
