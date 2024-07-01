@@ -50,8 +50,7 @@ pipeline {
         }
         stage('Scanning Images and after deleteing images') {
             steps {
-                script {
-                        
+                script {                       
 
                         echo " Deleting images after push registry"
 
@@ -63,8 +62,6 @@ pipeline {
                 }
             }
         }
-
-        stage(Docker)
         stage('Waiting for Project Head Approval Deployment') {
             steps {
                 script {
