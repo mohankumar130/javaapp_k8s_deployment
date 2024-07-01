@@ -7,11 +7,10 @@ pipeline {
         APP_NAME = "tomcat-java-app"
         RELEASE = "1.0.0"
         DOCKER_USER = "msy061618"
-        DOCKER_PASS = 'dockerhub'
-        IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
+        DOCKER_PASS = credentials('dockerhub')
+        IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
         CA_CERTIFICATE = credentials('kubeca')
-       
     }
     stages {
         stage('Git Checkout') {
@@ -24,7 +23,7 @@ pipeline {
                 sh 'mvn clean package'
             }
         }
-        stage('sonarQube Analysis') {
+        stage('SonarQube Analysis') {
             steps {
                 script {
                     withSonarQubeEnv(credentialsId: 'sonarqube-token') {
@@ -36,17 +35,14 @@ pipeline {
         stage('Docker Image Build & Push into Registry') {
             steps {
                 script {
-                    docker.withRegistry('',DOCKER_PASS) {
-                        docker_image = docker.build "${IMAGE_NAME}"
-                        }
-                        
-                    docker.withRegistry('',DOCKER_PASS) {
+                    docker.withRegistry('', DOCKER_PASS) {
+                        def docker_image = docker.build("${IMAGE_NAME}")
                         docker_image.push("${IMAGE_TAG}")
                         docker_image.push('latest')
-                        } {                            
+                        
                         def jobName = env.JOB_NAME
                         def previousVersionTag = "v1.${env.BUILD_ID.toInteger() - 1}"
-                        def previousImage = "${hub_user}/${jobName}:${previousVersionTag}"
+                        def previousImage = "${DOCKER_USER}/${jobName}:${previousVersionTag}"
                     
                         // Check if the previous image exists and delete it if it does
                         sh """
@@ -62,12 +58,13 @@ pipeline {
             steps {
                 script {
                     def userAborted = false
+                    def jobName = env.JOB_NAME
                     withCredentials([string(credentialsId: 'toaddress', variable: 'mailToRecipients'), 
                                      string(credentialsId: 'fromaddress', variable: 'useremail')]) {
-                        emailext body: '''
+                        emailext body: """
                         Please click the link below
-                        ${BUILD_URL}input to approve or Reject.<br>
-                        ''',
+                        ${BUILD_URL}input to approve or reject.<br>
+                        """,
                         mimeType: 'text/html',
                         subject: "Approval Needed: ${jobName}",
                         from: "${useremail}",
@@ -109,9 +106,9 @@ pipeline {
                     ) {
                         sh 'kubectl get nodes'
                         sh """
-                        helm upgrade --install ${tomcat-java-app} java-maven-chart \
+                        helm upgrade --install ${APP_NAME} java-maven-chart \
                          --set image.repository=${IMAGE_NAME} \
-                         --set image.tag= ${IMAGE_TAG}\
+                         --set image.tag=${IMAGE_TAG} \
                          --namespace uat
                         """
                     }
