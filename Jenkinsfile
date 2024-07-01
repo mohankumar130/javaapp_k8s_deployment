@@ -39,17 +39,11 @@ pipeline {
                         def docker_image = docker.build("${IMAGE_NAME}")
                         docker_image.push("${IMAGE_TAG}")
                         docker_image.push('latest')
+
+                        echo " Deleting images after push registry"
                         
-                        def jobName = env.JOB_NAME
-                        def previousVersionTag = "v1.${env.BUILD_ID.toInteger() - 1}"
-                        def previousImage = "${DOCKER_USER}/${jobName}:${previousVersionTag}"
-                    
-                        // Check if the previous image exists and delete it if it does
-                        sh """
-                        if docker images --format '{{.Repository}}:{{.Tag}}' | grep -q '${previousImage}'; then
-                            docker rmi -f ${previousImage}
-                        fi
-                        """
+                        sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
+                        sh "docker rmi ${IMAGE_NAME}:latest"
                     }
                 }
             }
