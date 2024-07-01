@@ -7,7 +7,7 @@ pipeline {
         APP_NAME = "tomcat-java-app"
         RELEASE = "1.0.0"
         DOCKER_USER = "msy061618"
-        DOCKER_PASS = credentials('dockerhub')
+        DOCKER_PASS = "dockerhub"
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
         CA_CERTIFICATE = credentials('kubeca')
