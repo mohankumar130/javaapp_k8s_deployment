@@ -13,6 +13,11 @@ pipeline {
         CA_CERTIFICATE = credentials('kubeca')
     }
     stages {
+        stage("Cleanup Workspace"){
+                steps {
+                cleanWs()
+                }
+        }
         stage('Git Checkout') {
             steps {
                 git 'https://github.com/mohankumar130/maven.git'
@@ -32,22 +37,34 @@ pipeline {
                 }
             }
         }
-        stage('Docker Image Build & Push into Registry') {
+        stage('Docker Image Build & scanning') {
             steps {
                 script {
                     docker.withRegistry('', DOCKER_PASS) {
                         def docker_image = docker.build("${IMAGE_NAME}")
                         docker_image.push("${IMAGE_TAG}")
                         docker_image.push('latest')
-
-                        echo " Deleting images after push registry"
-                        
-                        sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
-                        sh "docker rmi ${IMAGE_NAME}:latest"
                     }
                 }
             }
         }
+        stage('Scanning Images and after deleteing images') {
+            steps {
+                script {
+                        
+
+                        echo " Deleting images after push registry"
+
+                        sh 'trivy image ${IMAGE_NAME}:${IMAGE_TAG}'
+
+                        sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
+                        sh "docker rmi ${IMAGE_NAME}:latest"
+                                    
+                }
+            }
+        }
+
+        stage(Docker)
         stage('Waiting for Project Head Approval Deployment') {
             steps {
                 script {
