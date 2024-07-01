@@ -20,6 +20,15 @@ pipeline {
                 sh 'mvn clean package'
             }
         }
+        stage('sonarQube Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv(credentialsId: 'sonarqube-token') {
+                        sh "mvn sonar:sonar"
+                    }
+                }
+            }
+        }
         stage('Docker Image Build & Push into Registry') {
             steps {
                 script {

@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+    tools {
+        maven "Maven3"
+    }
+    environment {
+        hub_user = "msy061618"
+        containername = "tomcat"
+        CA_CERTIFICATE = credentials('kubeca')
+        jobName = "${env.JOB_NAME} #${env.BUILD_NUMBER}"
+    }
+    stages {
+        stage('Git Checkout') {
+            steps {
+                git 'https://github.com/mohankumar130/maven.git'
+            }
+        }
+        stage('Build Maven') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage('Test maven') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('sonarQube Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv(credentialsId: 'sonarqube-token') {
+                        sh "mvn sonar:sonar"
+                    }
+                }
+            }
+        }
+              
+        
+    }
+    post {
+        success {
+            echo "Build and deployment were successful."
+        }
+        failure {
+            echo "Build or deployment failed. Check the logs for details."
+        }
+    }
+}
