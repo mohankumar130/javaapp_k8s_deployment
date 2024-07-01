@@ -54,7 +54,7 @@ pipeline {
 
                         echo " Deleting images after push registry"
 
-                        sh 'trivy image ${IMAGE_NAME}:${IMAGE_TAG}'
+                        sh 'trivy --scanners vuln --exit-code 0 --severity HIGH,CRITICAL --format table ${IMAGE_NAME}:${IMAGE_TAG}'
 
                         sh "docker rmi ${IMAGE_NAME}:${IMAGE_TAG}"
                         sh "docker rmi ${IMAGE_NAME}:latest"
