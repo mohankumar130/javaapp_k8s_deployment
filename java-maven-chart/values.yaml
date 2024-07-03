@@ -79,10 +79,15 @@ livenessProbe:
   httpGet:
     path: /webapp
     port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  
 readinessProbe:
   httpGet:
     path: /webapp
     port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
 
 autoscaling:
   enabled: false
