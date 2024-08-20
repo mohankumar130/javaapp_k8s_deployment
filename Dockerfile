@@ -1,5 +1,5 @@
 # Os Images
-FROM ubuntu:latest
+FROM ubuntu:jammy
 # Set environment variables
 ENV CATALINA_HOME /opt/tomcat/tomcat10
 ENV PATH $CATALINA_HOME/bin:$PATH
