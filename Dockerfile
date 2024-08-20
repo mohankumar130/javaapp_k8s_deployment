@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir /opt/tomcat \
     && wget https://dlcdn.apache.org/tomcat/tomcat-10/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz -O /tmp/tomcat.tar.gz \ 
     && tar -xvzf /tmp/tomcat.tar.gz -C /opt/tomcat/ \
-    && mv /opt/tomcat/apache-tomcat-10.1.25 /opt/tomcat/tomcat10 \
+    && mv /opt/tomcat/apache-tomcat-${TOMCAT_VERSION} /opt/tomcat/tomcat10 \
     && rm -rf /tmp/tomcat.tar.gz
 # Ensure catalina.sh is executable
 RUN chmod +x /opt/tomcat/tomcat10/bin/catalina.sh
