@@ -3,7 +3,7 @@ FROM ubuntu:jammy
 # Set environment variables
 ENV CATALINA_HOME /opt/tomcat/tomcat10
 ENV PATH $CATALINA_HOME/bin:$PATH
-ENV TOMCAT_VERSION 10.1.28
+ENV TOMCAT_VERSION 10.1.31
 # Install necessary packages
 RUN apt-get update && apt-get install -y \
     openjdk-17-jdk \
